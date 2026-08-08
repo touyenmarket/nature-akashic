@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nature Akashic (by 2yen) — Solutions naturopathiques par maladie</title>
+<style>
+:root{
+  --primary:#2e7d32; --primary-dark:#1b5e20; --accent:#8e24aa;
+  --bg:#f4f7f4; --card:#ffffff; --ink:#263238; --muted:#607d8b;
+  --line:#e0e6e0; --radius:14px; --shadow:0 6px 24px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+
+.nav{position:sticky;top:0;z-index:50;background:linear-gradient(90deg,#2e7d32,#43a047 55%,#8e24aa);color:#fff;box-shadow:0 3px 12px rgba(0,0,0,.2)}
+.nav-inner{max-width:1180px;margin:auto;display:flex;align-items:center;gap:18px;padding:12px 20px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-size:1.35rem;font-weight:800}
+.brand .logo{font-size:1.9rem}
+.badge{background:#ffd54f;color:#3e2723;font-weight:800;padding:2px 10px;border-radius:20px;font-size:.8rem;margin-left:auto}
+
+.hero{background:linear-gradient(135deg,#e8f5e9,#e1f5fe 55%,#f3e5f5);padding:34px 20px 26px;text-align:center}
+.hero h1{font-size:1.9rem;font-weight:900;color:var(--primary-dark);margin-bottom:6px}
+.hero p{color:var(--muted);max-width:640px;margin:0 auto 20px}
+.searchbox{max-width:700px;margin:0 auto;display:flex;background:#fff;border-radius:50px;box-shadow:var(--shadow);overflow:hidden}
+.searchbox input{flex:1;border:none;padding:14px 20px;font-size:1rem;outline:none}
+.searchbox button{background:var(--primary);border:none;color:#fff;padding:0 22px;font-size:1rem;cursor:pointer;font-weight:700}
+
+.container{max-width:1180px;margin:auto;padding:22px 20px}
+.toolbar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+.catfilter{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+.cchip{border:1.5px solid var(--line);background:#fff;border-radius:8px;padding:5px 9px;font-size:.75rem;cursor:pointer;font-weight:700}
+.cchip.active{border-width:2.5px;background:var(--primary);color:#fff}
+.sev{display:flex;gap:5px}
+.sbtn{background:#fff;border:1.5px solid var(--line);border-radius:8px;padding:5px 9px;font-size:.78rem;cursor:pointer}
+.sbtn.active{font-weight:800;border-color:var(--primary)}
+
+.resultcount{color:var(--muted);font-weight:600;margin-bottom:10px;font-size:.9rem}
+
+.cardgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px}
+.rcard{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px;cursor:pointer;transition:.15s;border:1px solid var(--line)}
+.rcard:hover{transform:translateY(-2px)}
+.rcard h3{font-size:1rem;margin-bottom:4px;color:var(--primary-dark)}
+.rcard .cat{font-size:.72rem;color:var(--muted);font-weight:700;text-transform:uppercase}
+.rcard .sym{font-size:.85rem;margin:8px 0;color:var(--ink)}
+.rcard .grav{font-size:.78rem;font-weight:700}
+
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+.modal.open{display:flex}
+.modalbox{background:#fff;border-radius:var(--radius);max-width:640px;width:100%;max-height:85vh;overflow:auto;padding:26px}
+.modalbox h2{color:var(--primary-dark);margin-bottom:10px}
+.mfield{margin:10px 0}
+.mfield b{display:block;font-size:.75rem;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
+.mclose{float:right;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--muted)}
+
+.fab{position:fixed;bottom:24px;right:24px;background:var(--accent);color:#fff;border:none;border-radius:50%;width:56px;height:56px;font-size:1.6rem;cursor:pointer;box-shadow:var(--shadow);z-index:60}
+.status{position:fixed;top:70px;right:16px;background:#263238;color:#fff;padding:8px 16px;border-radius:8px;font-size:.85rem;z-index:200;opacity:0;transition:.3s}
+.status.show{opacity:1}
+
+form.fform input, form.fform textarea{width:100%;padding:9px;margin:5px 0 10px;border:1px solid var(--line);border-radius:8px;font-family:inherit}
+form.fform label{font-size:.78rem;font-weight:700;color:var(--muted)}
+.fbtns{display:flex;gap:10px;margin-top:14px}
+.fbtns button{flex:1;padding:10px;border-radius:8px;border:none;font-weight:700;cursor:pointer}
+.fbtns .save{background:var(--primary);color:#fff}
+.fbtns .cancel{background:#eee}
+.fbtns .delete{background:#d32f2f;color:#fff}
+</style>
+</head>
+<body>
+
+<div class="nav"><div class="nav-inner">
+  <div class="brand"><span class="logo">🌿</span> Nature Akashic</div>
+  <span class="badge" id="navCount">… solutions</span>
+</div></div>
+
+<div class="hero">
+  <h1>🌿 Trouvez le remède naturel adapté</h1>
+  <p>197 solutions naturopathiques classées par symptôme, zone et gravité — connecté en temps réel à la base Nature Akashic.</p>
+  <div class="searchbox">
+    <input id="searchInput" placeholder="Rechercher un symptôme, une plante, une zone...">
+    <button onclick="runSearch()">🔍 Chercher</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="toolbar">
+    <div class="catfilter" id="catChips"></div>
+    <div class="sev" id="sevBtns">
+      <button class="sbtn active" data-sev="all" onclick="setSev('all')">Tous</button>
+      <button class="sbtn" data-sev="🟢" onclick="setSev('🟢')">🟢 Bénin</button>
+      <button class="sbtn" data-sev="🟡" onclick="setSev('🟡')">🟡 Surveiller</button>
+      <button class="sbtn" data-sev="🔴" onclick="setSev('🔴')">🔴 Consulter</button>
+    </div>
+  </div>
+  <div class="resultcount" id="resultCount">Chargement…</div>
+  <div class="cardgrid" id="cardGrid"></div>
+</div>
+
+<button class="fab" onclick="openForm()" title="Ajouter un remède">➕</button>
+<div class="status" id="statusMsg"></div>
+
+<!-- Détail -->
+<div class="modal" id="modal">
+  <div class="modalbox">
+    <button class="mclose" onclick="closeModal()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<!-- Formulaire ajout/édition -->
+<div class="modal" id="formModal">
+  <div class="modalbox">
+    <button class="mclose" onclick="closeForm()">✕</button>
+    <h2 id="formTitle">➕ Ajouter un remède</h2>
+    <form class="fform" id="rform" onsubmit="return false;">
+      <label>Catégorie</label><input name="categorie" required>
+      <label>Nom du remède / maladie</label><input name="maladie" required>
+      <label>Type</label><input name="type">
+      <label>Symptômes</label><input name="symptomes">
+      <label>Zone</label><input name="zone">
+      <label>Gravité (🟢/🟡/🔴 + texte)</label><input name="gravite">
+      <label>Mots-clés symptômes</label><input name="symptomes_cles">
+      <label>Complément</label><input name="complement">
+      <label>Où le trouver</label><input name="ou">
+      <label>Contre-indication</label><input name="contre">
+      <label>Drapeaux rouges</label><input name="drapeaux">
+      <label>Recours / posologie</label><textarea name="recours" rows="2"></textarea>
+      <label>Référence cabinet</label><input name="reference">
+      <div class="fbtns">
+        <button class="save" onclick="saveForm()">💾 Enregistrer</button>
+        <button class="delete" id="delBtn" style="display:none" onclick="deleteRec()">🗑️ Supprimer</button>
+        <button class="cancel" onclick="closeForm()">Annuler</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============ CONFIG SUPABASE ============ */
+const SUPABASE_URL = 'https://ngvkgdojbwasnoasaqen.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ndmtnZG9qYndhc25vYXNhcWVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyMDI2MzYsImV4cCI6MjEwMTc3ODYzNn0.y-Z9X3hyhAolT_588JBdL5fEuOyO0ALHB-V97h6HK00';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let db = [];
+let state = { q:'', cat:'all', sev:'all' };
+let editingId = null;
+
+function showStatus(msg, isError){
+  const el = document.getElementById('statusMsg');
+  el.textContent = msg;
+  el.style.background = isError ? '#d32f2f' : '#263238';
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 2500);
+}
+
+async function loadDB(){
+  const { data, error } = await sb.from('remedes').select('*').order('categorie').order('maladie');
+  if (error){ showStatus('Erreur de chargement : ' + error.message, true); console.error(error); return; }
+  db = data;
+  renderChips();
+  render();
+}
+
+function cats(){ return ['all', ...Array.from(new Set(db.map(r=>r.categorie)))]; }
+
+function renderChips(){
+  const el = document.getElementById('catChips');
+  el.innerHTML = cats().map(c => `<button class="cchip ${state.cat===c?'active':''}" onclick="setCat('${c.replace(/'/g,"\\'")}')">${c==='all'?'Toutes catégories':c}</button>`).join('');
+}
+function setCat(c){ state.cat=c; renderChips(); render(); }
+function setSev(s){
+  state.sev=s;
+  document.querySelectorAll('.sbtn').forEach(b=>b.classList.toggle('active', b.dataset.sev===s));
+  render();
+}
+function runSearch(){ state.q = document.getElementById('searchInput').value.toLowerCase(); render(); }
+document.getElementById('searchInput').addEventListener('input', runSearch);
+
+function norm(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+
+function matches(r){
+  if (state.cat!=='all' && r.categorie!==state.cat) return false;
+  if (state.sev!=='all' && !(r.gravite||'').includes(state.sev)) return false;
+  if (state.q){
+    const q = norm(state.q);
+    const hay = norm([r.maladie,r.symptomes,r.symptomes_cles,r.complement,r.zone].join(' '));
+    if (!hay.includes(q)) return false;
+  }
+  return true;
+}
+
+function render(){
+  const list = db.filter(matches);
+  document.getElementById('resultCount').textContent = list.length + ' solution(s) trouvée(s)';
+  document.getElementById('navCount').textContent = db.length + ' solutions';
+  document.getElementById('cardGrid').innerHTML = list.map(r => `
+    <div class="rcard" onclick="openDetail(${r.id})">
+      <div class="cat">${r.categorie}</div>
+      <h3>🌿 ${r.maladie}</h3>
+      <div class="sym">${r.symptomes||''}</div>
+      <div class="grav">${r.gravite||''}</div>
+    </div>
+  `).join('') || '<p style="color:var(--muted)">Aucun résultat.</p>';
+}
+
+function findRec(id){ return db.find(r=>r.id===id); }
+
+function openDetail(id){
+  const r = findRec(id);
+  if (!r) return;
+  document.getElementById('modalContent').innerHTML = `
+    <h2>🌿 ${r.maladie}</h2>
+    <div style="color:var(--muted);margin-bottom:10px">${r.categorie} · ${r.zone||''} · ${r.gravite||''}</div>
+    <div class="mfield"><b>Symptômes</b>${r.symptomes||'—'}</div>
+    <div class="mfield"><b>Complément</b>${r.complement||'—'}</div>
+    <div class="mfield"><b>Où le trouver</b>${r.ou||'—'}</div>
+    <div class="mfield"><b>Recours / posologie</b>${r.recours||'—'}</div>
+    <div class="mfield"><b>Contre-indication</b>${r.contre||'—'}</div>
+    <div class="mfield"><b>🚨 Drapeaux rouges</b>${r.drapeaux||'—'}</div>
+    <div class="mfield"><b>Référence cabinet</b>${r.reference||'—'}</div>
+    <div class="fbtns" style="margin-top:16px">
+      <button class="save" onclick="closeModal();editRec(${r.id})">✏️ Modifier</button>
+      <button class="cancel" onclick="closeModal()">Fermer</button>
+    </div>
+  `;
+  document.getElementById('modal').classList.add('open');
+}
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+
+function openForm(){
+  editingId = null;
+  document.getElementById('formTitle').textContent = '➕ Ajouter un remède';
+  document.getElementById('delBtn').style.display = 'none';
+  document.getElementById('rform').reset();
+  document.getElementById('formModal').classList.add('open');
+}
+function editRec(id){
+  const r = findRec(id);
+  if (!r) return;
+  editingId = id;
+  document.getElementById('formTitle').textContent = '✏️ Modifier le remède';
+  document.getElementById('delBtn').style.display = 'block';
+  const form = document.getElementById('rform');
+  Object.keys(r).forEach(k => { if (form[k]) form[k].value = r[k] || ''; });
+  document.getElementById('formModal').classList.add('open');
+}
+function closeForm(){ document.getElementById('formModal').classList.remove('open'); }
+
+async function saveForm(){
+  const form = document.getElementById('rform');
+  const payload = {};
+  ['categorie','maladie','type','symptomes','zone','gravite','symptomes_cles','complement','ou','contre','drapeaux','recours','reference']
+    .forEach(k => payload[k] = form[k].value);
+
+  if (!payload.categorie || !payload.maladie){
+    showStatus('Catégorie et nom du remède sont obligatoires.', true);
+    return;
+  }
+
+  let error;
+  if (editingId){
+    ({ error } = await sb.from('remedes').update(payload).eq('id', editingId));
+  } else {
+    ({ error } = await sb.from('remedes').insert(payload));
+  }
+  if (error){ showStatus('Erreur : ' + error.message, true); return; }
+  showStatus(editingId ? 'Remède mis à jour ✅' : 'Remède ajouté ✅');
+  closeForm();
+  await loadDB();
+}
+
+async function deleteRec(){
+  if (!editingId) return;
+  const r = findRec(editingId);
+  if (!confirm(`Supprimer « ${r.maladie} » ?`)) return;
+  const { error } = await sb.from('remedes').delete().eq('id', editingId);
+  if (error){ showStatus('Erreur : ' + error.message, true); return; }
+  showStatus('Remède supprimé 🗑️');
+  closeForm();
+  await loadDB();
+}
+
+loadDB();
+</script>
+</body>
+</html>
