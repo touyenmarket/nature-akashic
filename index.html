@@ -78,6 +78,22 @@ form.fform label{font-size:.78rem;font-weight:700;color:var(--muted)}
 .fbtns .delete{background:#d32f2f;color:#fff}
 .catgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
 .catgriditem{color:#fff;border-radius:10px;padding:10px;font-size:.82rem;font-weight:700;cursor:pointer;text-align:center}
+
+/* FICHE PREMIUM (avec infographie) */
+.fiche-premium{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin:-26px -26px 0}
+.fhead-prem{color:#fff;padding:18px 20px}
+.fhead-prem .cat{background:rgba(255,255,255,.22);border-radius:20px;padding:3px 12px;font-size:.75rem;display:inline-block;margin-bottom:6px}
+.fhead-prem h3{font-size:1.35rem;line-height:1.2;margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.fhead-prem .lay{font-size:.7rem;background:rgba(255,255,255,.3);padding:2px 8px;border-radius:12px;font-weight:600}
+.fhead-prem .zone{font-size:.85rem;opacity:.9;margin-top:4px}
+.infograph-prem{background:#0f2a1f;padding:12px;text-align:center}
+.infograph-prem img{max-width:100%;height:auto;border-radius:10px;display:block;margin:0 auto;box-shadow:0 8px 30px rgba(0,0,0,.35)}
+.fbody-prem{padding:18px 20px;background:#fff}
+.grid-prem{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid-prem .box{background:#f7faf7;border:1px solid #e0e6e0;border-radius:12px;padding:13px;font-size:.87rem}
+.grid-prem .box b{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;color:#2e7d32;margin-bottom:7px}
+.grid-prem .box.full{grid-column:1/-1}
+@media(max-width:600px){.grid-prem{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -271,22 +287,54 @@ function openDetail(id){
   const r = findRec(id);
   if (!r) return;
   const catColor = CC[r.categorie]||'#78909c';
-  document.getElementById('modalContent').innerHTML = `
-    <span class="cat" style="background:${catColor}">${CE[r.categorie]||'🌿'} ${esc(r.categorie)}</span>
-    <h2 style="margin-top:8px">🌿 ${esc(r.maladie)}</h2>
-    <div style="color:var(--muted);margin-bottom:10px">${esc(r.zone||'')} · ${esc(r.gravite||'')}</div>
-    <div class="mfield"><b>Symptômes</b>${esc(r.symptomes)||'—'}</div>
-    <div class="mfield"><b>Complément</b>${esc(r.complement)||'—'}</div>
-    <div class="mfield"><b>Où le trouver</b>${esc(r.ou)||'—'}</div>
-    <div class="mfield"><b>Recours / posologie</b>${esc(r.recours)||'—'}</div>
-    <div class="mfield"><b>Contre-indication</b>${esc(r.contre)||'—'}</div>
-    <div class="mfield"><b>🚨 Drapeaux rouges</b>${esc(r.drapeaux)||'—'}</div>
-    <div class="mfield"><b>Référence cabinet</b>${esc(r.reference)||'—'}</div>
-    <div class="fbtns" style="margin-top:16px">
-      <button class="save" onclick="closeModal();editRec(${r.id})">✏️ Modifier</button>
-      <button class="cancel" onclick="closeModal()">Fermer</button>
-    </div>
-  `;
+
+  if (r.infographie_url) {
+    // ---- FICHE PREMIUM ----
+    document.getElementById('modalContent').innerHTML = `
+      <div class="fiche-premium">
+        <div class="fhead-prem" style="background:linear-gradient(120deg,${catColor},#43a047)">
+          <span class="cat" style="background:rgba(255,255,255,.25)">${CE[r.categorie]||'🌿'} ${esc(r.categorie)}</span>
+          <h3>🌿 ${esc(r.maladie)} ${r.layout ? `<span class="lay">${esc(r.layout)}</span>` : ''}</h3>
+          <div class="zone">${esc(r.zone||'')} · ${esc(r.gravite||'')}</div>
+        </div>
+        <div class="infograph-prem">
+          <img src="${esc(r.infographie_url)}" alt="Infographie ${esc(r.maladie)}">
+        </div>
+        <div class="fbody-prem">
+          <div class="grid-prem">
+            <div class="box full"><b>💊 Complément</b>${esc(r.complement)||'—'}</div>
+            <div class="box"><b>⚗️ Recours / posologie</b>${esc(r.recours)||'—'}</div>
+            <div class="box"><b>📍 Où le trouver</b>${esc(r.ou)||'—'}</div>
+            <div class="box full"><b>⚠️ Contre-indication</b>${esc(r.contre)||'—'}</div>
+            <div class="box full"><b>🚨 Quand consulter</b>${esc(r.drapeaux)||'—'}</div>
+            ${r.reference ? `<div class="box full"><b>📦 Référence cabinet</b>${esc(r.reference)}</div>` : ''}
+          </div>
+        </div>
+      </div>
+      <div class="fbtns" style="margin-top:16px">
+        <button class="save" onclick="closeModal();editRec(${r.id})">✏️ Modifier</button>
+        <button class="cancel" onclick="closeModal()">Fermer</button>
+      </div>
+    `;
+  } else {
+    // ---- FICHE BASIQUE (fallback) ----
+    document.getElementById('modalContent').innerHTML = `
+      <span class="cat" style="background:${catColor}">${CE[r.categorie]||'🌿'} ${esc(r.categorie)}</span>
+      <h2 style="margin-top:8px">🌿 ${esc(r.maladie)}</h2>
+      <div style="color:var(--muted);margin-bottom:10px">${esc(r.zone||'')} · ${esc(r.gravite||'')}</div>
+      <div class="mfield"><b>Symptômes</b>${esc(r.symptomes)||'—'}</div>
+      <div class="mfield"><b>Complément</b>${esc(r.complement)||'—'}</div>
+      <div class="mfield"><b>Où le trouver</b>${esc(r.ou)||'—'}</div>
+      <div class="mfield"><b>Recours / posologie</b>${esc(r.recours)||'—'}</div>
+      <div class="mfield"><b>Contre-indication</b>${esc(r.contre)||'—'}</div>
+      <div class="mfield"><b>🚨 Drapeaux rouges</b>${esc(r.drapeaux)||'—'}</div>
+      <div class="mfield"><b>Référence cabinet</b>${esc(r.reference)||'—'}</div>
+      <div class="fbtns" style="margin-top:16px">
+        <button class="save" onclick="closeModal();editRec(${r.id})">✏️ Modifier</button>
+        <button class="cancel" onclick="closeModal()">Fermer</button>
+      </div>
+    `;
+  }
   document.getElementById('modal').classList.add('open');
 }
 function closeModal(){ document.getElementById('modal').classList.remove('open'); }
