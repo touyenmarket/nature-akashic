@@ -35,8 +35,9 @@ body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;color:#fff;min-hei
 .searchbar input{background:none;border:none;color:#fff;font-size:1rem;flex:1;outline:none;text-shadow:0 1px 4px rgba(0,0,0,.6)}
 .searchbar input::placeholder{color:rgba(255,255,255,.6)}
 
-.chips{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:18px;max-width:620px}
-.chip{background:rgba(4,12,7,.45);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:6px 13px;font-size:.74rem;cursor:pointer;backdrop-filter:blur(6px);text-shadow:0 1px 4px rgba(0,0,0,.6);transition:.15s}
+.chips-wrap{max-width:820px;width:100%}
+.chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:18px;max-width:820px}
+.chip{background:rgba(4,12,7,.45);border:1px solid rgba(255,255,255,.2);border-radius:18px;padding:5px 11px;font-size:.68rem;cursor:pointer;backdrop-filter:blur(6px);text-shadow:0 1px 4px rgba(0,0,0,.6);transition:.15s}
 .chip:hover,.chip.active{background:rgba(76,175,80,.35);border-color:rgba(76,175,80,.6)}
 
 .hint{opacity:.55;font-size:.8rem;margin-top:22px;text-align:center;text-shadow:0 1px 6px rgba(0,0,0,.7)}
@@ -99,6 +100,8 @@ body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;color:#fff;min-hei
     <div class="searchbar">
       🔍 <input id="searchInput" placeholder="Ex : mal au ventre, anxiété, magnésium, sommeil...">
     </div>
+  </div>
+  <div class="chips-wrap" style="display:flex;justify-content:center">
     <div class="chips" id="catChips"></div>
   </div>
 
@@ -141,7 +144,7 @@ function cats(){ return Array.from(new Set(db.map(r=>r.categorie))).sort(); }
 
 function renderChips(){
   const el = document.getElementById('catChips');
-  el.innerHTML = cats().slice(0,8).map(c =>
+  el.innerHTML = cats().map(c =>
     `<span class="chip" onclick="selectCat(${JSON.stringify(c)})">${CE[c]||'🌿'} ${esc(c)}</span>`
   ).join('');
 }
