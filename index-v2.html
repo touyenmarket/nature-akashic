@@ -40,6 +40,17 @@ body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;color:#fff;min-hei
 .chip{background:rgba(4,12,7,.45);border:1px solid rgba(255,255,255,.2);border-radius:18px;padding:5px 11px;font-size:.68rem;cursor:pointer;backdrop-filter:blur(6px);text-shadow:0 1px 4px rgba(0,0,0,.6);transition:.15s}
 .chip:hover,.chip.active{background:rgba(76,175,80,.35);border-color:rgba(76,175,80,.6)}
 
+@media (max-width:700px){
+  .chips-wrap{max-width:100%;padding:0}
+  .chips{
+    flex-wrap:nowrap;justify-content:flex-start;overflow-x:auto;
+    max-width:100%;padding:2px 20px 10px;margin-left:-20px;margin-right:-20px;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  }
+  .chips::-webkit-scrollbar{display:none}
+  .chip{flex-shrink:0}
+}
+
 .hint{opacity:.55;font-size:.8rem;margin-top:22px;text-align:center;text-shadow:0 1px 6px rgba(0,0,0,.7)}
 
 /* Zone de résultats — vide au départ, se peuple dynamiquement */
