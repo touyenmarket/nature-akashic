@@ -145,7 +145,7 @@ function cats(){ return Array.from(new Set(db.map(r=>r.categorie))).sort(); }
 function renderChips(){
   const el = document.getElementById('catChips');
   el.innerHTML = cats().map(c =>
-    `<span class="chip" onclick="selectCat(${JSON.stringify(c)})">${CE[c]||'🌿'} ${esc(c)}</span>`
+    `<span class="chip" onclick='selectCat(${JSON.stringify(c)})'>${CE[c]||'🌿'} ${esc(c)}</span>`
   ).join('');
 }
 
