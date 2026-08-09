@@ -296,8 +296,8 @@ function openDetail(id){
 
   if (r.infographie_url) {
     // ---- FICHE PREMIUM (gabarit complet) ----
-    const aFaire = (r.a_faire || '').split(';').map(s=>s.trim()).filter(Boolean);
-    const aEviter = (r.a_eviter || '').split(';').map(s=>s.trim()).filter(Boolean);
+    const aFaire = (r.a_faire || '').split('|').map(s=>s.trim()).filter(Boolean);
+    const aEviter = (r.a_eviter || '').split('|').map(s=>s.trim()).filter(Boolean);
     document.getElementById('modalContent').innerHTML = `
       <div class="fiche-premium">
         <div class="fhead-prem" style="background:linear-gradient(120deg,${catColor},#43a047)">
