@@ -6,99 +6,123 @@
 <title>Nature Akashic (by 2yen) — Solutions naturopathiques par maladie</title>
 <style>
 :root{
-  --primary:#2e7d32; --primary-dark:#1b5e20; --accent:#8e24aa;
-  --bg:#f4f7f4; --card:#ffffff; --ink:#263238; --muted:#607d8b;
-  --line:#e0e6e0; --radius:14px; --shadow:0 6px 24px rgba(0,0,0,.08);
+  --primary:#4caf50; --primary-dark:#1b5e20; --accent:#8e24aa;
+  --bg:#050b06; --card:rgba(255,255,255,.06); --ink:#ffffff; --muted:rgba(255,255,255,.65);
+  --line:rgba(255,255,255,.15); --radius:14px; --shadow:0 10px 40px rgba(0,0,0,.5);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth}
-body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
-.nav{position:sticky;top:0;z-index:50;background:linear-gradient(90deg,#2e7d32,#43a047 55%,#8e24aa);color:#fff;box-shadow:0 3px 12px rgba(0,0,0,.2)}
+body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;background:radial-gradient(ellipse at top, #0d1f14 0%, #050b06 60%);color:var(--ink);line-height:1.5;min-height:100vh}
+.nav{position:sticky;top:0;z-index:50;background:rgba(4,10,6,.75);backdrop-filter:blur(12px);box-shadow:0 3px 20px rgba(0,0,0,.4);border-bottom:1px solid rgba(255,255,255,.08)}
 .nav-inner{max-width:1180px;margin:auto;display:flex;align-items:center;gap:18px;padding:12px 20px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px;font-size:1.35rem;font-weight:800;letter-spacing:.5px}
 .brand .logo{font-size:1.9rem}
 .brand i{font-size:.85rem;font-weight:400;opacity:.85}
 .nav-links{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
 .nav-links a{color:#fff;text-decoration:none;font-weight:600;font-size:.92rem;padding:8px 14px;border-radius:30px;transition:.2s;cursor:pointer}
-.nav-links a:hover{background:rgba(255,255,255,.22)}
+.nav-links a:hover{background:rgba(255,255,255,.12)}
 .badge{background:#ffd54f;color:#3e2723;font-weight:800;padding:2px 10px;border-radius:20px;font-size:.8rem}
-.hero{background:linear-gradient(135deg,#e8f5e9,#e1f5fe 55%,#f3e5f5);padding:38px 20px 30px;text-align:center}
-.hero h1{font-size:2.1rem;font-weight:900;color:var(--primary-dark);margin-bottom:6px}
-.hero p{color:var(--muted);max-width:640px;margin:0 auto 22px;font-size:1.02rem}
-.searchbox{max-width:720px;margin:0 auto;display:flex;background:#fff;border-radius:50px;box-shadow:var(--shadow);overflow:hidden}
-.searchbox input{flex:1;border:none;padding:16px 22px;font-size:1.05rem;outline:none}
+
+.hero{
+  position:relative;
+  background-image:url('fond_final/mare-lotus.webp');
+  background-size:cover;background-position:center 38%;background-repeat:no-repeat;
+  padding:60px 20px 50px;text-align:center;
+}
+.hero::before{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(ellipse 55% 55% at 46% 48%, rgba(3,10,6,.55) 0%, rgba(3,10,6,.25) 55%, transparent 80%);
+  pointer-events:none;
+}
+@media (max-width: 700px){ .hero{background-image:url('fond_final/mare-lotus-mobile.webp')} }
+.hero-inner{position:relative;z-index:5}
+.hero h1{font-size:2.1rem;font-weight:900;margin-bottom:6px;text-shadow:0 2px 12px rgba(0,0,0,.8), 0 0 22px rgba(0,0,0,.6)}
+.hero p{opacity:.92;max-width:640px;margin:0 auto 22px;font-size:1.02rem;text-shadow:0 2px 10px rgba(0,0,0,.8)}
+.searchbox{max-width:720px;margin:0 auto;display:flex;background:rgba(4,12,7,.6);border:1px solid rgba(255,255,255,.25);border-radius:50px;box-shadow:var(--shadow);overflow:hidden;backdrop-filter:blur(10px)}
+.searchbox input{flex:1;border:none;padding:16px 22px;font-size:1.05rem;outline:none;background:transparent;color:#fff}
+.searchbox input::placeholder{color:rgba(255,255,255,.55)}
 .searchbox button{background:var(--primary);border:none;color:#fff;padding:0 26px;font-size:1.1rem;cursor:pointer;font-weight:700}
-.zonechips{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:14px;max-width:980px;margin-left:auto;margin-right:auto}
-.zchip{background:#fff;border:1.5px solid var(--line);border-radius:20px;padding:4px 10px;cursor:pointer;font-size:.72rem;font-weight:600;transition:.15s;color:var(--ink);white-space:nowrap}
-.zchip.active{background:var(--primary);color:#fff;border-color:var(--primary)}
+.zonechips{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:16px;max-width:980px;margin-left:auto;margin-right:auto;position:relative;z-index:5}
+.zchip{background:rgba(4,12,7,.55);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:5px 12px;cursor:pointer;font-size:.72rem;font-weight:600;transition:.15s;color:#fff;white-space:nowrap;backdrop-filter:blur(6px)}
+.zchip.active{background:var(--primary);border-color:var(--primary)}
+
 .container{max-width:1180px;margin:auto;padding:26px 20px}
 .toolbar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-bottom:18px}
 .sev{display:flex;gap:6px;align-items:center}
-.sbtn{background:#fff;border:1.5px solid var(--line);border-radius:8px;padding:6px 10px;font-size:.8rem;cursor:pointer}
-.sbtn.active{font-weight:800;border-color:var(--primary);background:#e8f5e9}
+.sbtn{background:rgba(255,255,255,.06);border:1px solid var(--line);color:#fff;border-radius:8px;padding:6px 10px;font-size:.8rem;cursor:pointer}
+.sbtn.active{font-weight:800;border-color:var(--primary);background:rgba(76,175,80,.25)}
 .resultcount{color:var(--muted);font-weight:600;margin-bottom:12px}
-.tablewrap{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto;max-height:70vh}
+.tablewrap{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:auto;max-height:70vh}
 table{width:100%;border-collapse:collapse;min-width:1050px}
-thead th{position:sticky;top:0;background:var(--primary-dark);color:#fff;padding:12px 10px;text-align:left;font-size:.82rem;text-transform:uppercase;letter-spacing:.4px;z-index:2}
+thead th{position:sticky;top:0;background:rgba(4,10,6,.92);color:#fff;padding:12px 10px;text-align:left;font-size:.82rem;text-transform:uppercase;letter-spacing:.4px;z-index:2}
 tbody tr{border-bottom:1px solid var(--line);cursor:pointer;transition:background .12s}
-tbody tr:hover{background:#f5faf5}
-td{padding:12px 10px;font-size:.88rem;vertical-align:top}
+tbody tr:hover{background:rgba(255,255,255,.05)}
+td{padding:12px 10px;font-size:.88rem;vertical-align:top;color:#fff}
 .cat{display:inline-block;color:#fff;border-radius:8px;padding:3px 9px;font-size:.72rem;font-weight:700;white-space:nowrap}
-.mal{font-weight:700;color:var(--primary-dark)}
+.mal{font-weight:700;color:#c8e6c9}
 .zone{color:var(--muted);font-size:.8rem}
-.rec{background:#e8f5e9;border-radius:6px;padding:2px 6px;color:#1b5e20;font-size:.82rem}
+.rec{background:rgba(76,175,80,.2);border-radius:6px;padding:2px 6px;color:#c8e6c9;font-size:.82rem}
 .ref{color:var(--muted)}
 .ref.empty{opacity:.4}
 .cardgrid{display:none}
 @media(max-width:860px){
   .tablewrap{display:none}
   .cardgrid{display:grid;gap:12px}
-  .mcard{background:#fff;border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;cursor:pointer}
+  .mcard{background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:14px;cursor:pointer}
   .mcat{display:inline-block;color:#fff;border-radius:8px;padding:3px 9px;font-size:.72rem;font-weight:700;margin-bottom:6px}
-  .mmal{font-weight:800;color:var(--primary-dark);font-size:1rem;margin-bottom:2px}
+  .mmal{font-weight:800;color:#c8e6c9;font-size:1rem;margin-bottom:2px}
   .mmeta{color:var(--muted);font-size:.78rem;margin-bottom:6px}
-  .msym,.mcomp,.mrec,.mci{font-size:.84rem;margin:4px 0}
+  .msym,.mcomp,.mrec,.mci{font-size:.84rem;margin:4px 0;color:#fff}
 }
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
+
+/* Modals classiques (catégories, formulaire) restent en overlay centré */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:100;padding:20px}
 .modal.open{display:flex}
-.modalbox{background:#fff;border-radius:var(--radius);max-width:640px;width:100%;max-height:85vh;overflow:auto;padding:26px}
-.modalbox h2{color:var(--primary-dark);margin-bottom:10px}
+.modalbox{background:#0d1f14;border:1px solid var(--line);border-radius:var(--radius);max-width:640px;width:100%;max-height:85vh;overflow:auto;padding:26px;color:#fff}
+.modalbox h2{color:#c8e6c9;margin-bottom:10px}
 .mfield{margin:10px 0}
 .mfield b{display:block;font-size:.75rem;text-transform:uppercase;color:var(--muted);margin-bottom:2px}
 .mclose{float:right;background:none;border:none;font-size:1.4rem;cursor:pointer;color:var(--muted)}
 .fab{position:fixed;bottom:24px;right:24px;background:var(--accent);color:#fff;border:none;border-radius:50%;width:56px;height:56px;font-size:1.6rem;cursor:pointer;box-shadow:var(--shadow);z-index:60}
 .status{position:fixed;top:70px;right:16px;background:#263238;color:#fff;padding:8px 16px;border-radius:8px;font-size:.85rem;z-index:200;opacity:0;transition:.3s}
 .status.show{opacity:1}
-form.fform input, form.fform textarea{width:100%;padding:9px;margin:5px 0 10px;border:1px solid var(--line);border-radius:8px;font-family:inherit}
+form.fform input, form.fform textarea{width:100%;padding:9px;margin:5px 0 10px;border:1px solid var(--line);border-radius:8px;font-family:inherit;background:rgba(255,255,255,.06);color:#fff}
 form.fform label{font-size:.78rem;font-weight:700;color:var(--muted)}
 .fbtns{display:flex;gap:10px;margin-top:14px}
 .fbtns button{flex:1;padding:10px;border-radius:8px;border:none;font-weight:700;cursor:pointer}
 .fbtns .save{background:var(--primary);color:#fff}
-.fbtns .cancel{background:#eee}
+.fbtns .cancel{background:rgba(255,255,255,.1);color:#fff}
 .fbtns .delete{background:#d32f2f;color:#fff}
 .catgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
 .catgriditem{color:#fff;border-radius:10px;padding:10px;font-size:.82rem;font-weight:700;cursor:pointer;text-align:center}
 
-/* FICHE PREMIUM (avec infographie) */
-.fiche-premium{border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin:-26px -26px 0}
-.fhead-prem{color:#fff;padding:18px 20px}
-.fhead-prem .cat{background:rgba(255,255,255,.22);border-radius:20px;padding:3px 12px;font-size:.75rem;display:inline-block;margin-bottom:6px}
-.fhead-prem h3{font-size:1.35rem;line-height:1.2;margin:0;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.fhead-prem .lay{font-size:.7rem;background:rgba(255,255,255,.3);padding:2px 8px;border-radius:12px;font-weight:600}
-.fhead-prem .zone{font-size:.85rem;opacity:.9;margin-top:4px}
-.infograph-prem{background:#0f2a1f;padding:12px;text-align:center}
-.infograph-prem img{max-width:100%;height:auto;border-radius:10px;display:block;margin:0 auto;box-shadow:0 8px 30px rgba(0,0,0,.35)}
-.fbody-prem{padding:18px 20px;background:#fff}
-.grid-prem{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.grid-prem .box{background:#f7faf7;border:1px solid #e0e6e0;border-radius:12px;padding:13px;font-size:.87rem}
-.grid-prem .box b{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.5px;color:#2e7d32;margin-bottom:7px}
+/* ===== PAGE FICHE IMMERSIVE (plein écran, plus un petit modal) ===== */
+.fiche-page{position:fixed;inset:0;background:radial-gradient(ellipse at top, #0d1f14 0%, #050b06 60%);z-index:200;overflow-y:auto;
+  transform:translateY(24px);opacity:0;visibility:hidden;transition:transform .38s cubic-bezier(.22,.9,.32,1), opacity .32s ease, visibility 0s;}
+.fiche-page.open{transform:translateY(0);opacity:1;visibility:visible}
+.fiche-topbar{position:sticky;top:0;z-index:20;background:rgba(4,10,6,.75);backdrop-filter:blur(12px);padding:14px 20px;display:flex;align-items:center;gap:14px;border-bottom:1px solid rgba(255,255,255,.1)}
+.fiche-back{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;padding:8px 16px;border-radius:30px;font-size:.85rem;cursor:pointer}
+.fiche-topbar .cat{background:rgba(76,175,80,.25);color:#c8e6c9;padding:4px 14px;border-radius:20px;font-size:.78rem}
+.infograph-full{width:100%;max-height:78vh;overflow:hidden;position:relative;background:#020604}
+.infograph-full img{width:100%;height:auto;display:block}
+.infograph-full::after{content:"";position:absolute;bottom:0;left:0;right:0;height:110px;background:linear-gradient(to bottom, transparent, #050b06)}
+.fiche-body{max-width:760px;margin:-20px auto 60px;padding:0 20px;position:relative;z-index:5}
+.fiche-head{text-align:center;margin-bottom:30px;padding-top:20px}
+.fiche-head h1{font-size:1.8rem;font-weight:800;text-shadow:0 2px 14px rgba(0,0,0,.7);margin-bottom:6px}
+.fiche-head .meta{opacity:.8;font-size:.9rem;color:#fff}
+.grid-prem{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.grid-prem .box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:18px 20px;backdrop-filter:blur(10px);font-size:.9rem;color:#fff}
 .grid-prem .box.full{grid-column:1/-1}
-.grid-prem .box.histo{background:#fff8e1;font-style:italic;color:#5d4a12}
-.grid-prem .box.histo b{color:#8d6e00}
+.grid-prem .box.histo{background:rgba(255,213,79,.08);border-color:rgba(255,213,79,.25);font-style:italic}
+.grid-prem .box b{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.6px;color:#a5d6a7;margin-bottom:8px;font-weight:700;font-style:normal}
+.grid-prem .box.histo b{color:#ffd54f}
+.grid-prem .box.alert{background:rgba(229,57,53,.1);border-color:rgba(229,57,53,.3)}
+.grid-prem .box.alert b{color:#ef9a9a}
 .chk{list-style:none;padding:0;margin-top:4px}
-.chk li{margin:5px 0;padding-left:22px;position:relative;font-size:.87rem}
+.chk li{margin:6px 0;padding-left:26px;position:relative;font-size:.9rem}
 .chk.ok li::before{content:"✅";position:absolute;left:0}
 .chk.no li::before{content:"🚫";position:absolute;left:0}
+.fiche-cta{background:linear-gradient(120deg, rgba(142,36,170,.35), rgba(76,175,80,.25));border:1px solid rgba(255,255,255,.25);border-radius:18px;padding:22px;text-align:center;margin-top:10px;backdrop-filter:blur(10px)}
 @media(max-width:600px){.grid-prem{grid-template-columns:1fr}}
 </style>
 </head>
@@ -116,13 +140,15 @@ form.fform label{font-size:.78rem;font-weight:700;color:var(--muted)}
 </div></div>
 
 <div class="hero">
-  <h1>🌿 Trouvez la solution naturopathique adaptée</h1>
-  <p>Recherchez par <b>symptôme</b> (« mal au ventre », « ballonné », « fatigue »...), par <b>plante</b> (valériane, curcuma...) ou par <b>zone du corps</b>. La base évolue en temps réel via Supabase.</p>
-  <div class="searchbox">
-    <input id="searchInput" placeholder="Ex : mal au ventre, anxiété, magnésium, dos, sommeil...">
-    <button onclick="runSearch()">🔍 Rechercher</button>
+  <div class="hero-inner">
+    <h1>🌿 Trouvez la solution naturopathique adaptée</h1>
+    <p>Recherchez par <b>symptôme</b> (« mal au ventre », « ballonné », « fatigue »...), par <b>plante</b> (valériane, curcuma...) ou par <b>zone du corps</b>. La base évolue en temps réel via Supabase.</p>
+    <div class="searchbox">
+      <input id="searchInput" placeholder="Ex : mal au ventre, anxiété, magnésium, dos, sommeil...">
+      <button onclick="runSearch()">🔍 Rechercher</button>
+    </div>
+    <div class="zonechips" id="catChips"></div>
   </div>
-  <div class="zonechips" id="catChips"></div>
 </div>
 
 <div class="container">
@@ -151,8 +177,13 @@ form.fform label{font-size:.78rem;font-weight:700;color:var(--muted)}
 <button class="fab" onclick="openForm()" title="Ajouter un remède">➕</button>
 <div class="status" id="statusMsg"></div>
 
-<div class="modal" id="modal">
-  <div class="modalbox"><button class="mclose" onclick="closeModal()">✕</button><div id="modalContent"></div></div>
+<!-- PAGE FICHE IMMERSIVE PLEIN ÉCRAN -->
+<div class="fiche-page" id="fichePage">
+  <div class="fiche-topbar">
+    <button class="fiche-back" onclick="closeFiche()">← Retour</button>
+    <span class="cat" id="ficheCat"></span>
+  </div>
+  <div id="ficheContent"></div>
 </div>
 
 <div class="modal" id="catModal">
@@ -294,64 +325,78 @@ function openDetail(id){
   if (!r) return;
   const catColor = CC[r.categorie]||'#78909c';
 
+  document.getElementById('ficheCat').innerHTML = `${CE[r.categorie]||'🌿'} ${esc(r.categorie)}`;
+  document.getElementById('ficheCat').style.background = `${catColor}55`;
+
   if (r.infographie_url) {
-    // ---- FICHE PREMIUM (gabarit complet) ----
+    // ---- FICHE PREMIUM (gabarit complet, plein écran) ----
     const aFaire = (r.a_faire || '').split('|').map(s=>s.trim()).filter(Boolean);
     const aEviter = (r.a_eviter || '').split('|').map(s=>s.trim()).filter(Boolean);
-    document.getElementById('modalContent').innerHTML = `
-      <div class="fiche-premium">
-        <div class="fhead-prem" style="background:linear-gradient(120deg,${catColor},#43a047)">
-          <span class="cat" style="background:rgba(255,255,255,.25)">${CE[r.categorie]||'🌿'} ${esc(r.categorie)}</span>
-          <h3>🌿 ${esc(r.maladie)} ${r.layout ? `<span class="lay">${esc(r.layout)}</span>` : ''}</h3>
-          <div class="zone">${esc(r.zone||'')} · ${esc(r.gravite||'')}</div>
-        </div>
-        <div class="infograph-prem">
-          <img src="${esc(r.infographie_url)}" alt="Infographie ${esc(r.maladie)}">
-        </div>
-        <div class="fbody-prem">
-          <div class="grid-prem">
-            ${r.historique ? `<div class="box full histo">📜 <b>D'où vient ce remède ?</b>${esc(r.historique)}</div>` : ''}
-            <div class="box"><b>💊 Complément</b>${esc(r.complement)||'—'}</div>
-            <div class="box"><b>⚗️ Posologie</b>${esc(r.recours)||'—'}</div>
-            ${r.duree_cure ? `<div class="box"><b>⏱️ Durée de cure</b>${esc(r.duree_cure)}</div>` : ''}
-            <div class="box"><b>📍 Où le trouver</b>${esc(r.ou)||'—'}</div>
-            ${aFaire.length ? `<div class="box full"><b>✅ À faire</b><ul class="chk ok">${aFaire.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
-            ${aEviter.length ? `<div class="box"><b>❌ À éviter</b><ul class="chk no">${aEviter.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
-            ${r.associations ? `<div class="box"><b>🔄 Associations</b>${esc(r.associations)}</div>` : ''}
-            ${r.preparation ? `<div class="box"><b>🍽️ Préparation</b>${esc(r.preparation)}</div>` : ''}
-            <div class="box full"><b>⚠️ Contre-indication</b>${esc(r.contre)||'—'}</div>
-            <div class="box full"><b>🚨 Quand consulter</b>${esc(r.drapeaux)||'—'}</div>
-            ${r.reference ? `<div class="box full"><b>📦 Référence cabinet</b>${esc(r.reference)}</div>` : ''}
-          </div>
-        </div>
+    document.getElementById('ficheContent').innerHTML = `
+      <div class="infograph-full">
+        <img src="${esc(r.infographie_url)}" alt="Infographie ${esc(r.maladie)}">
       </div>
-      <div class="fbtns" style="margin-top:16px">
-        <button class="save" onclick="closeModal();editRec(${r.id})">✏️ Modifier</button>
-        <button class="cancel" onclick="closeModal()">Fermer</button>
+      <div class="fiche-body">
+        <div class="fiche-head">
+          <h1>🌿 ${esc(r.maladie)} ${r.layout ? `<span style="font-size:.7rem;background:rgba(255,255,255,.15);padding:2px 8px;border-radius:12px;font-weight:600;vertical-align:middle">${esc(r.layout)}</span>` : ''}</h1>
+          <div class="meta">${esc(r.zone||'')} · ${esc(r.gravite||'')}</div>
+        </div>
+        <div class="grid-prem">
+          ${r.historique ? `<div class="box full histo">📜 <b>D'où vient ce remède ?</b>${esc(r.historique)}</div>` : ''}
+          <div class="box"><b>💊 Complément</b>${esc(r.complement)||'—'}</div>
+          <div class="box"><b>⚗️ Posologie</b>${esc(r.recours)||'—'}</div>
+          ${r.duree_cure ? `<div class="box"><b>⏱️ Durée de cure</b>${esc(r.duree_cure)}</div>` : ''}
+          <div class="box"><b>📍 Où le trouver</b>${esc(r.ou)||'—'}</div>
+          ${aFaire.length ? `<div class="box full"><b>✅ À faire</b><ul class="chk ok">${aFaire.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
+          ${aEviter.length ? `<div class="box"><b>❌ À éviter</b><ul class="chk no">${aEviter.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
+          ${r.associations ? `<div class="box"><b>🔄 Associations</b>${esc(r.associations)}</div>` : ''}
+          ${r.preparation ? `<div class="box"><b>🍽️ Préparation</b>${esc(r.preparation)}</div>` : ''}
+          <div class="box full alert"><b>⚠️ Contre-indication</b>${esc(r.contre)||'—'}</div>
+          <div class="box full alert"><b>🚨 Quand consulter</b>${esc(r.drapeaux)||'—'}</div>
+          ${r.reference ? `<div class="box full"><b>📦 Référence cabinet</b>${esc(r.reference)}</div>` : ''}
+        </div>
+        <div class="fbtns" style="margin-top:6px">
+          <button class="save" onclick="closeFiche();editRec(${r.id})">✏️ Modifier</button>
+        </div>
       </div>
     `;
   } else {
-    // ---- FICHE BASIQUE (fallback) ----
-    document.getElementById('modalContent').innerHTML = `
-      <span class="cat" style="background:${catColor}">${CE[r.categorie]||'🌿'} ${esc(r.categorie)}</span>
-      <h2 style="margin-top:8px">🌿 ${esc(r.maladie)}</h2>
-      <div style="color:var(--muted);margin-bottom:10px">${esc(r.zone||'')} · ${esc(r.gravite||'')}</div>
-      <div class="mfield"><b>Symptômes</b>${esc(r.symptomes)||'—'}</div>
-      <div class="mfield"><b>Complément</b>${esc(r.complement)||'—'}</div>
-      <div class="mfield"><b>Où le trouver</b>${esc(r.ou)||'—'}</div>
-      <div class="mfield"><b>Recours / posologie</b>${esc(r.recours)||'—'}</div>
-      <div class="mfield"><b>Contre-indication</b>${esc(r.contre)||'—'}</div>
-      <div class="mfield"><b>🚨 Drapeaux rouges</b>${esc(r.drapeaux)||'—'}</div>
-      <div class="mfield"><b>Référence cabinet</b>${esc(r.reference)||'—'}</div>
-      <div class="fbtns" style="margin-top:16px">
-        <button class="save" onclick="closeModal();editRec(${r.id})">✏️ Modifier</button>
-        <button class="cancel" onclick="closeModal()">Fermer</button>
+    // ---- FICHE BASIQUE (fallback, sans infographie, même univers) ----
+    document.getElementById('ficheContent').innerHTML = `
+      <div class="fiche-body" style="margin-top:20px">
+        <div class="fiche-head">
+          <h1>🌿 ${esc(r.maladie)}</h1>
+          <div class="meta">${esc(r.zone||'')} · ${esc(r.gravite||'')}</div>
+        </div>
+        <div class="grid-prem">
+          <div class="box full"><b>Symptômes</b>${esc(r.symptomes)||'—'}</div>
+          <div class="box"><b>Complément</b>${esc(r.complement)||'—'}</div>
+          <div class="box"><b>Où le trouver</b>${esc(r.ou)||'—'}</div>
+          <div class="box"><b>Recours / posologie</b>${esc(r.recours)||'—'}</div>
+          <div class="box full alert"><b>Contre-indication</b>${esc(r.contre)||'—'}</div>
+          <div class="box full alert"><b>🚨 Drapeaux rouges</b>${esc(r.drapeaux)||'—'}</div>
+          ${r.reference ? `<div class="box full"><b>Référence cabinet</b>${esc(r.reference)}</div>` : ''}
+        </div>
+        <div class="fbtns" style="margin-top:6px">
+          <button class="save" onclick="closeFiche();editRec(${r.id})">✏️ Modifier</button>
+        </div>
       </div>
     `;
   }
-  document.getElementById('modal').classList.add('open');
+
+  const page = document.getElementById('fichePage');
+  page.scrollTop = 0;
+  requestAnimationFrame(()=> page.classList.add('open'));
+  history.pushState({fiche:id}, '', '#remede/' + encodeURIComponent(r.maladie));
 }
-function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+
+function closeFiche(){
+  document.getElementById('fichePage').classList.remove('open');
+  if (location.hash.startsWith('#remede/')) history.pushState({}, '', location.pathname);
+}
+window.addEventListener('popstate', ()=>{
+  if (!location.hash.startsWith('#remede/')) document.getElementById('fichePage').classList.remove('open');
+});
 function openCatModal(){ document.getElementById('catModal').classList.add('open'); }
 function closeCatModal(){ document.getElementById('catModal').classList.remove('open'); }
 
