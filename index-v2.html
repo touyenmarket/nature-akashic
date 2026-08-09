@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nature Akashic</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;color:#fff;min-height:100vh}
+
+/* Fond plein écran, fixe pendant le scroll pour rester immersif même quand des résultats apparaissent */
+.bg{
+  position:fixed;inset:0;z-index:-2;
+  background-image:url('fond_final/mare-lotus.webp');
+  background-size:cover;background-position:center 38%;background-repeat:no-repeat;
+}
+@media (max-width:700px){ .bg{background-image:url('fond_final/mare-lotus-mobile.webp')} }
+.bg::after{
+  content:"";position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 55% at 46% 40%, rgba(3,10,6,.5) 0%, rgba(3,10,6,.28) 55%, transparent 80%);
+}
+/* Voile qui s'assombrit progressivement une fois qu'on scrolle vers les résultats, pour la lisibilité */
+.dim{position:fixed;inset:0;z-index:-1;background:rgba(2,6,3,0);transition:background .3s;pointer-events:none}
+.dim.on{background:rgba(2,6,3,.35)}
+
+.stage{position:relative;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 20px 40px}
+
+.brand{display:flex;align-items:center;gap:12px;font-size:2rem;font-weight:800;margin-bottom:8px;text-shadow:0 2px 14px rgba(0,0,0,.85),0 0 26px rgba(0,0,0,.6)}
+.tagline{opacity:.95;font-size:.95rem;margin-bottom:34px;text-align:center;text-shadow:0 2px 12px rgba(0,0,0,.85)}
+
+.searchwrap{width:100%;max-width:600px}
+.searchbar{width:100%;background:rgba(4,12,7,.55);border:1px solid rgba(255,255,255,.28);border-radius:40px;padding:16px 26px;font-size:1rem;color:#fff;backdrop-filter:blur(12px) saturate(1.1);display:flex;align-items:center;gap:12px;box-shadow:0 10px 40px rgba(0,0,0,.5);transition:.2s}
+.searchbar:focus-within{border-color:rgba(255,255,255,.5);box-shadow:0 14px 50px rgba(0,0,0,.6)}
+.searchbar input{background:none;border:none;color:#fff;font-size:1rem;flex:1;outline:none;text-shadow:0 1px 4px rgba(0,0,0,.6)}
+.searchbar input::placeholder{color:rgba(255,255,255,.6)}
+
+.chips{display:flex;gap:7px;flex-wrap:wrap;justify-content:center;margin-top:18px;max-width:620px}
+.chip{background:rgba(4,12,7,.45);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:6px 13px;font-size:.74rem;cursor:pointer;backdrop-filter:blur(6px);text-shadow:0 1px 4px rgba(0,0,0,.6);transition:.15s}
+.chip:hover,.chip.active{background:rgba(76,175,80,.35);border-color:rgba(76,175,80,.6)}
+
+.hint{opacity:.55;font-size:.8rem;margin-top:22px;text-align:center;text-shadow:0 1px 6px rgba(0,0,0,.7)}
+
+/* Zone de résultats — vide au départ, se peuple dynamiquement */
+.results{width:100%;max-width:640px;margin-top:10px;display:flex;flex-direction:column;gap:14px;padding-bottom:60px}
+.rcount{opacity:.75;font-size:.82rem;text-align:center;margin-bottom:4px;text-shadow:0 1px 6px rgba(0,0,0,.7)}
+.rcard{background:rgba(4,10,6,.68);border:1px solid rgba(255,255,255,.2);border-radius:16px;padding:18px 22px;backdrop-filter:blur(12px) saturate(1.1);cursor:pointer;box-shadow:0 8px 30px rgba(0,0,0,.4);transition:.2s;animation:riseIn .35s ease both}
+.rcard:hover{border-color:rgba(255,255,255,.4);transform:translateY(-2px)}
+.rcard .cat{display:inline-block;color:#fff;border-radius:20px;padding:2px 11px;font-size:.68rem;font-weight:700;margin-bottom:7px}
+.rcard h3{font-size:1.02rem;margin-bottom:3px}
+.rcard .meta{opacity:.75;font-size:.78rem;margin-bottom:9px}
+.rcard p{font-size:.85rem;opacity:.92;line-height:1.5}
+@keyframes riseIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+.empty-note{opacity:.5;font-size:.85rem;text-align:center;margin-top:30px;text-shadow:0 1px 6px rgba(0,0,0,.7)}
+
+/* Fiche immersive plein écran (identique à la V1, réutilisée à l'identique) */
+.fiche-page{position:fixed;inset:0;background:radial-gradient(ellipse at top,#0d1f14 0%,#050b06 60%);z-index:200;overflow-y:auto;
+  transform:translateY(24px);opacity:0;visibility:hidden;transition:transform .38s cubic-bezier(.22,.9,.32,1),opacity .32s ease,visibility 0s}
+.fiche-page.open{transform:translateY(0);opacity:1;visibility:visible}
+.fiche-topbar{position:sticky;top:0;z-index:20;background:rgba(4,10,6,.75);backdrop-filter:blur(12px);padding:14px 20px;display:flex;align-items:center;gap:14px;border-bottom:1px solid rgba(255,255,255,.1)}
+.fiche-back{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;padding:8px 16px;border-radius:30px;font-size:.85rem;cursor:pointer}
+.fiche-topbar .catbadge{background:rgba(76,175,80,.25);color:#c8e6c9;padding:4px 14px;border-radius:20px;font-size:.78rem}
+.infograph-full{width:100%;max-height:78vh;overflow:hidden;position:relative;background:#020604}
+.infograph-full img{width:100%;height:auto;display:block}
+.infograph-full::after{content:"";position:absolute;bottom:0;left:0;right:0;height:110px;background:linear-gradient(to bottom,transparent,#050b06)}
+.fiche-body{max-width:760px;margin:-20px auto 60px;padding:0 20px;position:relative;z-index:5}
+.fiche-head{text-align:center;margin-bottom:30px;padding-top:20px}
+.fiche-head h1{font-size:1.8rem;font-weight:800;text-shadow:0 2px 14px rgba(0,0,0,.7);margin-bottom:6px}
+.fiche-head .meta{opacity:.8;font-size:.9rem;color:#fff}
+.grid-prem{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.grid-prem .box{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.15);border-radius:16px;padding:18px 20px;backdrop-filter:blur(10px);font-size:.9rem;color:#fff}
+.grid-prem .box.full{grid-column:1/-1}
+.grid-prem .box.histo{background:rgba(255,213,79,.08);border-color:rgba(255,213,79,.25);font-style:italic}
+.grid-prem .box b{display:block;font-size:.72rem;text-transform:uppercase;letter-spacing:.6px;color:#a5d6a7;margin-bottom:8px;font-weight:700;font-style:normal}
+.grid-prem .box.histo b{color:#ffd54f}
+.grid-prem .box.alert{background:rgba(229,57,53,.1);border-color:rgba(229,57,53,.3)}
+.grid-prem .box.alert b{color:#ef9a9a}
+.chk{list-style:none;padding:0;margin-top:4px}
+.chk li{margin:6px 0;padding-left:26px;position:relative;font-size:.9rem}
+.chk.ok li::before{content:"✅";position:absolute;left:0}
+.chk.no li::before{content:"🚫";position:absolute;left:0}
+@media(max-width:600px){.grid-prem{grid-template-columns:1fr}}
+
+.switch-version{position:fixed;top:16px;right:16px;z-index:60;background:rgba(4,10,6,.6);border:1px solid rgba(255,255,255,.2);color:#fff;padding:8px 14px;border-radius:20px;font-size:.75rem;text-decoration:none;backdrop-filter:blur(8px)}
+</style>
+</head>
+<body>
+
+<div class="bg"></div>
+<div class="dim" id="dim"></div>
+<a href="index.html" class="switch-version">↔ Voir la V1</a>
+
+<div class="stage">
+  <div class="brand">🌿 Nature Akashic</div>
+  <div class="tagline">Trouvez la solution naturopathique adaptée à votre symptôme</div>
+
+  <div class="searchwrap">
+    <div class="searchbar">
+      🔍 <input id="searchInput" placeholder="Ex : mal au ventre, anxiété, magnésium, sommeil...">
+    </div>
+    <div class="chips" id="catChips"></div>
+  </div>
+
+  <p class="hint" id="hint">Tapez un symptôme, une plante ou une zone du corps — les résultats s'affichent instantanément.</p>
+
+  <div class="results" id="results"></div>
+</div>
+
+<!-- Fiche immersive plein écran -->
+<div class="fiche-page" id="fichePage">
+  <div class="fiche-topbar">
+    <button class="fiche-back" onclick="closeFiche()">← Retour</button>
+    <span class="catbadge" id="ficheCat"></span>
+  </div>
+  <div id="ficheContent"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = 'https://ngvkgdojbwasnoasaqen.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5ndmtnZG9qYndhc25vYXNhcWVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyMDI2MzYsImV4cCI6MjEwMTc3ODYzNn0.y-Z9X3hyhAolT_588JBdL5fEuOyO0ALHB-V97h6HK00';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const CC = {"Appareil urinaire": "#e91e63", "Appétit & Sucres": "#43a047", "Circulation & Cœur": "#8e24aa", "Digestion & Transit": "#fb8c00", "Douleurs & Neurologie": "#fbc02d", "Détox & Élimination": "#d81b60", "Fatigue & Énergie": "#00838f", "Fertilité & Conception": "#0277bd", "Homme & Vitalité": "#5d4037", "Hormones & Ménopause": "#6a1b9a", "Immunité & Défenses": "#ef6c00", "Migraines & Céphalées": "#2e7d32", "Mémoire, Concentration & Cerveau": "#c62828", "Métabolisme & Poids": "#455a64", "Os & Articulations": "#558b2f", "Peau, Cheveux & Ongles": "#d84315", "Prévention & Anti-âge": "#3949ab", "Récupération sportive & Muscles": "#00695c", "Santé Mentale & Émotions": "#26a69a", "Santé bucco-dentaire": "#e64a19", "Sphère ORL (Oreille-Nez-Gorge)": "#e91e63", "Stress, Anxiété & Sommeil": "#43a047", "Traumatologie & Blessures": "#8e24aa", "Urgences & Premiers secours": "#fb8c00", "Voies respiratoires": "#fbc02d", "Yeux & Vision": "#d81b60"};
+const CE = {"Hormones & Ménopause": "🌸", "Digestion & Transit": "🌿", "Stress, Anxiété & Sommeil": "😴", "Immunité & Défenses": "🛡️", "Fatigue & Énergie": "⚡", "Circulation & Cœur": "❤️", "Peau, Cheveux & Ongles": "✨", "Os & Articulations": "🦴", "Voies respiratoires": "🫁", "Métabolisme & Poids": "⚖️", "Appareil urinaire": "🚽", "Yeux & Vision": "👀", "Mémoire, Concentration & Cerveau": "🧠", "Santé bucco-dentaire": "🦷", "Récupération sportive & Muscles": "💪", "Migraines & Céphalées": "🤕", "Détox & Élimination": "🧪", "Fertilité & Conception": "🤰", "Sphère ORL (Oreille-Nez-Gorge)": "👂", "Appétit & Sucres": "🍬", "Urgences & Premiers secours": "🚑", "Traumatologie & Blessures": "🩹", "Douleurs & Neurologie": "💊", "Santé Mentale & Émotions": "💆", "Prévention & Anti-âge": "🌱", "Homme & Vitalité": "♂️"};
+
+let db = [];
+let activeCat = null;
+const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function norm(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+
+async function loadDB(){
+  const { data, error } = await sb.from('remedes').select('*').order('categorie').order('maladie');
+  if (error){ console.error(error); return; }
+  db = data;
+  renderChips();
+}
+
+function cats(){ return Array.from(new Set(db.map(r=>r.categorie))).sort(); }
+
+function renderChips(){
+  const el = document.getElementById('catChips');
+  el.innerHTML = cats().slice(0,8).map(c =>
+    `<span class="chip" onclick="selectCat(${JSON.stringify(c)})">${CE[c]||'🌿'} ${esc(c)}</span>`
+  ).join('');
+}
+
+function selectCat(c){
+  activeCat = (activeCat===c) ? null : c;
+  document.getElementById('searchInput').value = '';
+  render();
+  document.querySelectorAll('.chip').forEach(ch=>ch.classList.toggle('active', ch.textContent.trim().includes(c)));
+}
+
+function render(){
+  const q = norm(document.getElementById('searchInput').value);
+  const dim = document.getElementById('dim');
+  const results = document.getElementById('results');
+  const hint = document.getElementById('hint');
+
+  if (!q && !activeCat){
+    results.innerHTML = '';
+    hint.style.display = 'block';
+    dim.classList.remove('on');
+    return;
+  }
+  hint.style.display = 'none';
+  dim.classList.add('on');
+
+  let list = db.filter(r=>{
+    if (activeCat && r.categorie !== activeCat) return false;
+    if (q){
+      const hay = norm([r.maladie,r.symptomes,r.symptomes_cles,r.complement,r.zone].join(' '));
+      if (!hay.includes(q)) return false;
+    }
+    return true;
+  }).slice(0,30);
+
+  if (!list.length){
+    results.innerHTML = `<p class="empty-note">Aucun résultat pour cette recherche. Essayez un autre mot-clé.</p>`;
+    return;
+  }
+
+  results.innerHTML = `<p class="rcount">${list.length} solution(s) trouvée(s)</p>` + list.map((r,i)=>{
+    const catColor = CC[r.categorie]||'#78909c';
+    return `<div class="rcard" style="animation-delay:${Math.min(i*30,300)}ms" onclick="openDetail(${r.id})">
+      <span class="cat" style="background:${catColor}">${CE[r.categorie]||'🌿'} ${esc(r.categorie)}</span>
+      <h3>🌿 ${esc(r.maladie)}</h3>
+      <div class="meta">${esc(r.zone||'')} · ${esc(r.gravite||'')}</div>
+      <p>${esc(r.complement)||''} ${r.recours ? '— '+esc(r.recours) : ''}</p>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('searchInput').addEventListener('input', ()=>{ activeCat=null; render(); });
+
+function findRec(id){ return db.find(r=>r.id===id); }
+
+function openDetail(id){
+  const r = findRec(id);
+  if (!r) return;
+  const catColor = CC[r.categorie]||'#78909c';
+  document.getElementById('ficheCat').innerHTML = `${CE[r.categorie]||'🌿'} ${esc(r.categorie)}`;
+
+  if (r.infographie_url){
+    const aFaire = (r.a_faire||'').split('|').map(s=>s.trim()).filter(Boolean);
+    const aEviter = (r.a_eviter||'').split('|').map(s=>s.trim()).filter(Boolean);
+    document.getElementById('ficheContent').innerHTML = `
+      <div class="infograph-full"><img src="${esc(r.infographie_url)}" alt="Infographie ${esc(r.maladie)}"></div>
+      <div class="fiche-body">
+        <div class="fiche-head"><h1>🌿 ${esc(r.maladie)}</h1><div class="meta">${esc(r.zone||'')} · ${esc(r.gravite||'')}</div></div>
+        <div class="grid-prem">
+          ${r.historique ? `<div class="box full histo">📜 <b>D'où vient ce remède ?</b>${esc(r.historique)}</div>` : ''}
+          <div class="box"><b>💊 Complément</b>${esc(r.complement)||'—'}</div>
+          <div class="box"><b>⚗️ Posologie</b>${esc(r.recours)||'—'}</div>
+          ${r.duree_cure ? `<div class="box"><b>⏱️ Durée de cure</b>${esc(r.duree_cure)}</div>` : ''}
+          <div class="box"><b>📍 Où le trouver</b>${esc(r.ou)||'—'}</div>
+          ${aFaire.length ? `<div class="box full"><b>✅ À faire</b><ul class="chk ok">${aFaire.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
+          ${aEviter.length ? `<div class="box"><b>❌ À éviter</b><ul class="chk no">${aEviter.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>` : ''}
+          ${r.associations ? `<div class="box"><b>🔄 Associations</b>${esc(r.associations)}</div>` : ''}
+          ${r.preparation ? `<div class="box"><b>🍽️ Préparation</b>${esc(r.preparation)}</div>` : ''}
+          <div class="box full alert"><b>⚠️ Contre-indication</b>${esc(r.contre)||'—'}</div>
+          <div class="box full alert"><b>🚨 Quand consulter</b>${esc(r.drapeaux)||'—'}</div>
+          ${r.reference ? `<div class="box full"><b>📦 Référence cabinet</b>${esc(r.reference)}</div>` : ''}
+        </div>
+      </div>`;
+  } else {
+    document.getElementById('ficheContent').innerHTML = `
+      <div class="fiche-body" style="margin-top:20px">
+        <div class="fiche-head"><h1>🌿 ${esc(r.maladie)}</h1><div class="meta">${esc(r.zone||'')} · ${esc(r.gravite||'')}</div></div>
+        <div class="grid-prem">
+          <div class="box full"><b>Symptômes</b>${esc(r.symptomes)||'—'}</div>
+          <div class="box"><b>Complément</b>${esc(r.complement)||'—'}</div>
+          <div class="box"><b>Où le trouver</b>${esc(r.ou)||'—'}</div>
+          <div class="box"><b>Recours / posologie</b>${esc(r.recours)||'—'}</div>
+          <div class="box full alert"><b>Contre-indication</b>${esc(r.contre)||'—'}</div>
+          <div class="box full alert"><b>🚨 Drapeaux rouges</b>${esc(r.drapeaux)||'—'}</div>
+          ${r.reference ? `<div class="box full"><b>Référence cabinet</b>${esc(r.reference)}</div>` : ''}
+        </div>
+      </div>`;
+  }
+
+  const page = document.getElementById('fichePage');
+  page.scrollTop = 0;
+  requestAnimationFrame(()=> page.classList.add('open'));
+  history.pushState({fiche:id}, '', '#remede/' + encodeURIComponent(r.maladie));
+}
+
+function closeFiche(){
+  document.getElementById('fichePage').classList.remove('open');
+  if (location.hash.startsWith('#remede/')) history.pushState({}, '', location.pathname);
+}
+window.addEventListener('popstate', ()=>{
+  if (!location.hash.startsWith('#remede/')) document.getElementById('fichePage').classList.remove('open');
+});
+
+loadDB();
+</script>
+</body>
+</html>
