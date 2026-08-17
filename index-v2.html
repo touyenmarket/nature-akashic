@@ -212,7 +212,8 @@ function render(){
     if (activeCat && r.categorie !== activeCat) return false;
     if (q){
       const hay = norm([r.maladie,r.symptomes,r.symptomes_cles,r.complement,r.zone].join(' '));
-      if (!hay.includes(q)) return false;
+      const words = q.split(/\s+/).filter(Boolean);
+      if (!words.every(w => hay.includes(w))) return false;
     }
     return true;
   }).slice(0,30);
