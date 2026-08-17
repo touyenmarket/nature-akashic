@@ -278,7 +278,8 @@ function matches(r){
   if (state.q){
     const q = norm(state.q);
     const hay = norm([r.maladie,r.symptomes,r.symptomes_cles,r.complement,r.zone].join(' '));
-    if (!hay.includes(q)) return false;
+    const words = q.split(/\s+/).filter(Boolean);
+    if (!words.every(w => hay.includes(w))) return false;
   }
   return true;
 }
