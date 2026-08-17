@@ -477,6 +477,8 @@ loadDB();
 
 // ---- Dictée vocale ----
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
 if (SpeechRecognition){
   document.getElementById('micBtn').style.display = 'inline-block';
   const recognition = new SpeechRecognition();
@@ -496,6 +498,11 @@ if (SpeechRecognition){
   };
   recognition.onend = () => { document.getElementById('micBtn').textContent = '🎤'; };
   recognition.onerror = () => { document.getElementById('micBtn').textContent = '🎤'; };
+} else if (isIOS) {
+  const iosHint = document.createElement('p');
+  iosHint.textContent = '🎤 Astuce iPhone : touchez le micro du clavier pour dicter votre recherche';
+  iosHint.style.cssText = 'opacity:.6;font-size:.78rem;text-align:center;margin-top:10px';
+  document.querySelector('.zonechips').after(iosHint);
 }
 </script>
 </body>
