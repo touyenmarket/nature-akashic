@@ -145,6 +145,7 @@ form.fform label{font-size:.78rem;font-weight:700;color:var(--muted)}
     <p>Recherchez par <b>symptôme</b> (« mal au ventre », « ballonné », « fatigue »...), par <b>plante</b> (valériane, curcuma...) ou par <b>zone du corps</b>. La base évolue en temps réel via Supabase.</p>
     <div class="searchbox">
       <input id="searchInput" placeholder="Ex : mal au ventre, anxiété, magnésium, dos, sommeil...">
+      <button id="micBtn" onclick="startDictation()" style="display:none;background:none;border:none;font-size:1.2rem;cursor:pointer;padding:0 12px;color:#fff" title="Recherche vocale">🎤</button>
       <button onclick="runSearch()">🔍 Rechercher</button>
     </div>
     <div class="zonechips" id="catChips"></div>
@@ -400,7 +401,18 @@ window.addEventListener('popstate', ()=>{
 function openCatModal(){ document.getElementById('catModal').classList.add('open'); }
 function closeCatModal(){ document.getElementById('catModal').classList.remove('open'); }
 
+const ADMIN_PASSWORD = 'akashic2026'; // à changer par le mot de passe de ton choix
+let unlocked = false;
+function checkAccess(){
+  if (unlocked) return true;
+  const pwd = prompt('🔒 Mot de passe pour modifier la base :');
+  if (pwd === ADMIN_PASSWORD){ unlocked = true; return true; }
+  if (pwd !== null) showStatus('Mot de passe incorrect', true);
+  return false;
+}
+
 function openForm(){
+  if (!checkAccess()) return;
   editingId = null;
   document.getElementById('formTitle').textContent = '➕ Ajouter un remède';
   document.getElementById('delBtn').style.display = 'none';
@@ -408,6 +420,7 @@ function openForm(){
   document.getElementById('formModal').classList.add('open');
 }
 function editRec(id){
+  if (!checkAccess()) return;
   const r = findRec(id);
   if (!r) return;
   editingId = id;
@@ -454,6 +467,29 @@ async function deleteRec(){
 }
 
 loadDB();
+
+// ---- Dictée vocale ----
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SpeechRecognition){
+  document.getElementById('micBtn').style.display = 'inline-block';
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'fr-FR';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  window.startDictation = function(){
+    const btn = document.getElementById('micBtn');
+    btn.textContent = '🔴';
+    recognition.start();
+  };
+  recognition.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+    document.getElementById('searchInput').value = text;
+    runSearch();
+  };
+  recognition.onend = () => { document.getElementById('micBtn').textContent = '🎤'; };
+  recognition.onerror = () => { document.getElementById('micBtn').textContent = '🎤'; };
+}
 </script>
 </body>
 </html>
