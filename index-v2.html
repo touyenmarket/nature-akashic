@@ -113,6 +113,7 @@ body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;color:#fff;min-hei
   <div class="searchwrap">
     <div class="searchbar">
       🔍 <input id="searchInput" placeholder="Ex : mal au ventre, anxiété, magnésium, sommeil...">
+      <button id="micBtn" onclick="startDictation()" style="display:none;background:none;border:none;font-size:1.15rem;cursor:pointer;color:#fff" title="Recherche vocale">🎤</button>
     </div>
   </div>
   <div class="chips-wrap" style="display:flex;justify-content:center">
@@ -132,6 +133,28 @@ body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;color:#fff;min-hei
   </div>
   <div id="ficheContent"></div>
 </div>
+
+<!-- Formulaire d'édition (protégé par mot de passe) -->
+<div class="modal" id="formModal" style="position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:300;padding:20px">
+  <div style="background:#0d1f14;border:1px solid rgba(255,255,255,.15);border-radius:16px;max-width:520px;width:100%;max-height:85vh;overflow:auto;padding:24px">
+    <button onclick="closeForm()" style="float:right;background:none;border:none;color:#fff;font-size:1.3rem;cursor:pointer">✕</button>
+    <h2 id="formTitle" style="margin-bottom:14px">✏️ Modifier le remède</h2>
+    <form id="rform" onsubmit="return false;" style="display:flex;flex-direction:column;gap:6px">
+      <label style="font-size:.75rem;opacity:.7">Catégorie</label><input name="categorie" style="padding:9px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff">
+      <label style="font-size:.75rem;opacity:.7">Maladie</label><input name="maladie" style="padding:9px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff">
+      <label style="font-size:.75rem;opacity:.7">Symptômes</label><input name="symptomes" style="padding:9px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff">
+      <label style="font-size:.75rem;opacity:.7">Complément</label><input name="complement" style="padding:9px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff">
+      <label style="font-size:.75rem;opacity:.7">Posologie</label><input name="recours" style="padding:9px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff">
+      <label style="font-size:.75rem;opacity:.7">Contre-indication</label><input name="contre" style="padding:9px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff">
+      <label style="font-size:.75rem;opacity:.7">Drapeaux rouges</label><input name="drapeaux" style="padding:9px;border-radius:8px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff">
+      <div style="display:flex;gap:10px;margin-top:14px">
+        <button onclick="saveForm()" style="flex:1;padding:11px;border-radius:8px;border:none;background:#4caf50;color:#fff;font-weight:700;cursor:pointer">💾 Enregistrer</button>
+        <button onclick="closeForm()" style="flex:1;padding:11px;border-radius:8px;border:none;background:rgba(255,255,255,.1);color:#fff;cursor:pointer">Annuler</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div id="statusMsg" style="position:fixed;top:16px;right:16px;background:#263238;color:#fff;padding:9px 18px;border-radius:8px;font-size:.85rem;z-index:400;opacity:0;transition:.3s"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
@@ -241,6 +264,7 @@ function openDetail(id){
           <div class="box full alert"><b>🚨 Quand consulter</b>${esc(r.drapeaux)||'—'}</div>
           ${r.reference ? `<div class="box full"><b>📦 Référence cabinet</b>${esc(r.reference)}</div>` : ''}
         </div>
+        <div style="margin-top:6px"><button onclick="editRec(${r.id})" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#fff;padding:9px 18px;border-radius:20px;font-size:.85rem;cursor:pointer">✏️ Modifier</button></div>
       </div>`;
   } else {
     document.getElementById('ficheContent').innerHTML = `
@@ -255,6 +279,7 @@ function openDetail(id){
           <div class="box full alert"><b>🚨 Drapeaux rouges</b>${esc(r.drapeaux)||'—'}</div>
           ${r.reference ? `<div class="box full"><b>Référence cabinet</b>${esc(r.reference)}</div>` : ''}
         </div>
+        <div style="margin-top:6px"><button onclick="editRec(${r.id})" style="background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:#fff;padding:9px 18px;border-radius:20px;font-size:.85rem;cursor:pointer">✏️ Modifier</button></div>
       </div>`;
   }
 
@@ -273,6 +298,80 @@ window.addEventListener('popstate', ()=>{
 });
 
 loadDB();
+
+// ---- Édition protégée par mot de passe ----
+const ADMIN_PASSWORD = 'akashic2026'; // à changer par le mot de passe de ton choix
+let unlocked = false;
+let editingId = null;
+
+function checkAccess(){
+  if (unlocked) return true;
+  const pwd = prompt('🔒 Mot de passe pour modifier la base :');
+  if (pwd === ADMIN_PASSWORD){ unlocked = true; return true; }
+  if (pwd !== null) showStatus('Mot de passe incorrect', true);
+  return false;
+}
+
+function showStatus(msg, isError){
+  const el = document.getElementById('statusMsg');
+  el.textContent = msg;
+  el.style.background = isError ? '#d32f2f' : '#263238';
+  el.style.opacity = 1;
+  setTimeout(()=>{ el.style.opacity = 0; }, 2500);
+}
+
+function editRec(id){
+  if (!checkAccess()) return;
+  const r = findRec(id);
+  if (!r) return;
+  editingId = id;
+  const form = document.getElementById('rform');
+  ['categorie','maladie','symptomes','complement','recours','contre','drapeaux'].forEach(k=>{
+    if (form[k]) form[k].value = r[k] || '';
+  });
+  document.getElementById('formModal').style.display = 'flex';
+}
+
+function closeForm(){
+  document.getElementById('formModal').style.display = 'none';
+}
+
+async function saveForm(){
+  const form = document.getElementById('rform');
+  const payload = {};
+  ['categorie','maladie','symptomes','complement','recours','contre','drapeaux'].forEach(k => payload[k] = form[k].value);
+
+  const { error } = await sb.from('remedes').update(payload).eq('id', editingId);
+  if (error){ showStatus('Erreur : ' + error.message, true); return; }
+  showStatus('Remède mis à jour ✅');
+  closeForm();
+  await loadDB();
+  render();
+}
+
+// ---- Dictée vocale ----
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+if (SpeechRecognition){
+  document.getElementById('micBtn').style.display = 'inline-block';
+  const recognition = new SpeechRecognition();
+  recognition.lang = 'fr-FR';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  window.startDictation = function(){
+    const btn = document.getElementById('micBtn');
+    btn.textContent = '🔴';
+    recognition.start();
+  };
+  recognition.onresult = (e) => {
+    const text = e.results[0][0].transcript;
+    document.getElementById('searchInput').value = text;
+    activeCat = null;
+    render();
+  };
+  recognition.onend = () => { document.getElementById('micBtn').textContent = '🎤'; };
+  recognition.onerror = () => { document.getElementById('micBtn').textContent = '🎤'; };
+}
 </script>
 </body>
 </html>
