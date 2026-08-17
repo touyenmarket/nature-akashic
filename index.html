@@ -270,7 +270,13 @@ function setSev(s){
 function runSearch(){ state.q = document.getElementById('searchInput').value.toLowerCase(); render(); }
 document.getElementById('searchInput').addEventListener('input', runSearch);
 
-function norm(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+function norm(s){
+  let t = (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  t = t.replace(/\bmaux\b/g, 'mal');
+  t = t.replace(/\byeux\b/g, 'oeil');
+  t = t.replace(/\bœil\b/g, 'oeil');
+  return t;
+}
 
 function matches(r){
   if (state.cat!=='all' && r.categorie!==state.cat) return false;
