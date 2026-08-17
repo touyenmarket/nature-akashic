@@ -168,7 +168,15 @@ const CE = {"Hormones & Ménopause": "🌸", "Digestion & Transit": "🌿", "Str
 let db = [];
 let activeCat = null;
 const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-function norm(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+function norm(s){
+  let t = (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  // Corrections pour pluriels irréguliers / variantes fréquentes en santé
+  t = t.replace(/\bmaux\b/g, 'mal');
+  t = t.replace(/\byeux\b/g, 'oeil');
+  t = t.replace(/\bœil\b/g, 'oeil');
+  t = t.replace(/\bnez\b/g, 'nez');
+  return t;
+}
 
 async function loadDB(){
   const { data, error } = await sb.from('remedes').select('*').order('categorie').order('maladie');
