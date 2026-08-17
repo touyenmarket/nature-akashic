@@ -74,9 +74,16 @@ body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;color:#fff;min-hei
 .fiche-topbar{position:sticky;top:0;z-index:20;background:rgba(4,10,6,.75);backdrop-filter:blur(12px);padding:14px 20px;display:flex;align-items:center;gap:14px;border-bottom:1px solid rgba(255,255,255,.1)}
 .fiche-back{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;padding:8px 16px;border-radius:30px;font-size:.85rem;cursor:pointer}
 .fiche-topbar .catbadge{background:rgba(76,175,80,.25);color:#c8e6c9;padding:4px 14px;border-radius:20px;font-size:.78rem}
-.infograph-full{width:100%;max-height:78vh;overflow:hidden;position:relative;background:#020604}
+.infograph-full{width:100%;max-height:78vh;overflow:hidden;position:relative;background:#020604;cursor:pointer}
 .infograph-full img{width:100%;height:auto;display:block}
 .infograph-full::after{content:"";position:absolute;bottom:0;left:0;right:0;height:110px;background:linear-gradient(to bottom,transparent,#050b06)}
+
+.imgviewer{position:fixed;inset:0;background:#000;z-index:500;display:none;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+.imgviewer.open{display:flex;align-items:center}
+.imgviewer img{height:100vh;width:auto;max-width:none;display:block;user-select:none;-webkit-user-drag:none}
+.imgviewer-close{position:fixed;top:16px;right:16px;z-index:10;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;width:40px;height:40px;border-radius:50%;font-size:1.1rem;backdrop-filter:blur(8px)}
+.imgviewer-hint{position:fixed;bottom:20px;left:0;right:0;text-align:center;font-size:.78rem;opacity:.7;z-index:10;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.8);pointer-events:none;animation:fadeOutHint 3s forwards}
+@keyframes fadeOutHint{0%,60%{opacity:.7}100%{opacity:0}}
 .fiche-body{max-width:760px;margin:-20px auto 60px;padding:0 20px;position:relative;z-index:5}
 .fiche-head{text-align:center;margin-bottom:30px;padding-top:20px}
 .fiche-head h1{font-size:1.8rem;font-weight:800;text-shadow:0 2px 14px rgba(0,0,0,.7);margin-bottom:6px}
@@ -126,6 +133,13 @@ body{font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;color:#fff;min-hei
 </div>
 
 <!-- Fiche immersive plein écran -->
+<!-- Viewer plein écran pour l'infographie (mobile) -->
+<div class="imgviewer" id="imgViewer">
+  <button class="imgviewer-close" onclick="closeImgViewer()">✕</button>
+  <img id="imgViewerImg" src="" alt="Infographie plein écran">
+  <p class="imgviewer-hint">👉 Glissez pour voir toute l'infographie</p>
+</div>
+
 <div class="fiche-page" id="fichePage">
   <div class="fiche-topbar">
     <button class="fiche-back" onclick="closeFiche()">← Retour</button>
@@ -256,7 +270,7 @@ function openDetail(id){
     const aFaire = (r.a_faire||'').split('|').map(s=>s.trim()).filter(Boolean);
     const aEviter = (r.a_eviter||'').split('|').map(s=>s.trim()).filter(Boolean);
     document.getElementById('ficheContent').innerHTML = `
-      <div class="infograph-full"><img src="${esc(r.infographie_url)}" alt="Infographie ${esc(r.maladie)}"></div>
+      <div class="infograph-full" onclick="openImgViewer('${esc(r.infographie_url)}')"><img src="${esc(r.infographie_url)}" alt="Infographie ${esc(r.maladie)}"></div>
       <div class="fiche-body">
         <div class="fiche-head"><h1>🌿 ${esc(r.maladie)}</h1><div class="meta">${esc(r.zone||'')} · ${esc(r.gravite||'')}</div></div>
         <div class="grid-prem">
@@ -307,6 +321,19 @@ window.addEventListener('popstate', ()=>{
 });
 
 loadDB();
+
+// ---- Viewer plein écran de l'infographie (mobile) ----
+function openImgViewer(url){
+  document.getElementById('imgViewerImg').src = url;
+  document.getElementById('imgViewer').classList.add('open');
+  setTimeout(()=>{
+    const v = document.getElementById('imgViewer');
+    v.scrollLeft = (v.scrollWidth - v.clientWidth) / 2;
+  }, 50);
+}
+function closeImgViewer(){
+  document.getElementById('imgViewer').classList.remove('open');
+}
 
 // ---- Édition protégée par mot de passe ----
 const ADMIN_PASSWORD = 'akashic2026'; // à changer par le mot de passe de ton choix
