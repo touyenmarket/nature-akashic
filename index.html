@@ -131,8 +131,15 @@ form.fform label{font-size:.78rem;font-weight:700;color:var(--muted)}
 .chk.ok li::before{content:"✅";position:absolute;left:0}
 .chk.no li::before{content:"🚫";position:absolute;left:0}
 .fiche-cta{background:linear-gradient(120deg, rgba(142,36,170,.35), rgba(76,175,80,.25));border:1px solid rgba(255,255,255,.25);border-radius:18px;padding:22px;text-align:center;margin-top:10px;backdrop-filter:blur(10px)}
+.disclaimer{background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.25);border-radius:12px;padding:14px 16px;margin-top:16px;font-size:.78rem;opacity:.85;line-height:1.5;text-align:center}
+.disclaimer b{opacity:1}
+.urgence-banner{background:rgba(211,47,47,.22);border:1.5px solid rgba(239,154,154,.6);border-radius:14px;padding:16px 18px;margin:14px 0 20px;text-align:center}
+.urgence-banner .titre{font-weight:800;color:#ffcdd2;font-size:.95rem;margin-bottom:6px}
+.urgence-banner .nums{font-size:.85rem;opacity:.9}
 @media(max-width:600px){.grid-prem{grid-template-columns:1fr}}
 </style>
+<!-- Analytics respectueux de la vie privée (RGPD-friendly, sans bannière cookie nécessaire) -->
+<script defer data-domain="TON-DOMAINE.vercel.app" src="https://plausible.io/js/script.js"></script>
 </head>
 <body>
 
@@ -182,6 +189,12 @@ form.fform label{font-size:.78rem;font-weight:700;color:var(--muted)}
   </div>
   <div class="cardgrid" id="cardGrid"></div>
 </div>
+
+<footer style="text-align:center;padding:30px 20px;opacity:.6;font-size:.8rem">
+  🌿 Nature Akashic — <a href="mentions-legales.html" style="color:inherit">Mentions légales</a> · 
+  <a href="politique-confidentialite.html" style="color:inherit">Confidentialité</a> · 
+  <a href="cgv.html" style="color:inherit">CGV</a>
+</footer>
 
 <button class="fab" onclick="openForm()" title="Ajouter un remède">➕</button>
 <div class="status" id="statusMsg"></div>
@@ -343,6 +356,17 @@ function render(){
 
 function findRec(id){ return db.find(r=>r.id===id); }
 
+function disclaimerHTML(){
+  return `<div class="disclaimer">⚠️ <b>Ces informations sont fournies à titre éducatif et ne remplacent pas un avis médical.</b> Nature Akashic ne pose aucun diagnostic et ne prescrit aucun traitement. En cas de doute, de symptôme persistant ou de situation grave, consultez un professionnel de santé.</div>`;
+}
+function urgenceBannerHTML(r){
+  if (!(r.gravite||'').includes('🔴')) return '';
+  return `<div class="urgence-banner">
+    <div class="titre">🚨 Ce symptôme peut nécessiter une consultation rapide</div>
+    <div class="nums">Contactez votre médecin traitant, ou en urgence : <b>15</b> (SAMU) · <b>112</b> (numéro d'urgence européen)</div>
+  </div>`;
+}
+
 function openDetail(id){
   const r = findRec(id);
   if (!r) return;
@@ -364,6 +388,7 @@ function openDetail(id){
           <h1>🌿 ${esc(r.maladie)} ${r.layout ? `<span style="font-size:.7rem;background:rgba(255,255,255,.15);padding:2px 8px;border-radius:12px;font-weight:600;vertical-align:middle">${esc(r.layout)}</span>` : ''}</h1>
           <div class="meta">${esc(r.zone||'')} · ${esc(r.gravite||'')}</div>
         </div>
+        ${urgenceBannerHTML(r)}
         <div class="grid-prem">
           ${r.historique ? `<div class="box full histo">📜 <b>D'où vient ce remède ?</b>${esc(r.historique)}</div>` : ''}
           <div class="box"><b>💊 Complément</b>${esc(r.complement)||'—'}</div>
@@ -381,6 +406,7 @@ function openDetail(id){
         <div class="fbtns" style="margin-top:6px">
           <button class="save" onclick="closeFiche();editRec(${r.id})">✏️ Modifier</button>
         </div>
+        ${disclaimerHTML()}
       </div>
     `;
   } else {
@@ -391,6 +417,7 @@ function openDetail(id){
           <h1>🌿 ${esc(r.maladie)}</h1>
           <div class="meta">${esc(r.zone||'')} · ${esc(r.gravite||'')}</div>
         </div>
+        ${urgenceBannerHTML(r)}
         <div class="grid-prem">
           <div class="box full"><b>Symptômes</b>${esc(r.symptomes)||'—'}</div>
           <div class="box"><b>Complément</b>${esc(r.complement)||'—'}</div>
@@ -403,6 +430,7 @@ function openDetail(id){
         <div class="fbtns" style="margin-top:6px">
           <button class="save" onclick="closeFiche();editRec(${r.id})">✏️ Modifier</button>
         </div>
+        ${disclaimerHTML()}
       </div>
     `;
   }
